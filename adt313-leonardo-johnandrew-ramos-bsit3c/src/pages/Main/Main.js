@@ -25,7 +25,7 @@ function Main() {
         <div className='navigation'>
           <ul>
             <li>
-              <a href='/main/dashboard'>Dashboard</a>
+              <a href='/main/movies'>Movies</a>
             </li>
             <li className='logout'>
               <a onClick={handleLogout}>Logout</a>

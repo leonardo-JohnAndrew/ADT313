@@ -1,0 +1,129 @@
+
+
+
+.head2{
+  color: lightyellow;
+  background-color: #000;
+  margin: 0pc;
+  height: 60px;
+  padding: 10px;
+  border-bottom: 2px solid gold;
+ 
+}
+.search-container button{
+  color: yellow;
+  box-shadow:none;
+  
+  padding: 2px;
+
+}
+
+ .searched-movie {
+  max-height: 150px;
+  overflow-y: auto ;
+  background-color:lightyellow; 
+
+}
+
+.searched-movie .list{
+   color: brown;
+   font-weight: 700; 
+
+  
+}
+.search-container .title{
+  background-color:  black;
+  color:  lightyellow;
+  margin: 0px;
+  font-size: small;
+  padding-left: 20px;
+  padding-top: 5px;
+  border-bottom: 2px solid brown;
+  
+}
+.search-container p:hover {
+  background-color: gold;
+}
+
+.poster-image {
+  width: 150px;
+  height: auto;
+  padding: 10px ;
+  margin: 5%;
+  background: yellow;
+  bottom: 0px;
+  
+}
+
+.search-container{
+  color: #000;
+  
+}
+
+ .search-container  .searched-movie .page{
+  position: sticky;
+  background-color: black;
+  bottom: 0px; 
+
+
+ 
+} .searched-movie .page span {
+ color: lightyellow;
+  font-size: 12px;
+ padding-left: 10px;
+ padding-right: 10px;
+ border:  none;
+}
+.container .container {
+
+  max-height: max-content;
+  background-color: #000;
+}  
+
+.container{ 
+  overflow-y: scroll;
+  background-color: gold;  
+ 
+}
+.container .container form  button{
+  margin-bottom:10%;
+  margin-left: 40%;
+margin-top: 20px; 
+}
+.container .container .field{
+color: gold ;
+margin-left: 1rem;
+
+}
+.container .container input{
+    background: transparent;
+    border: none;
+    color: lightgoldenrodyellow;
+    padding-left: 10px;
+    text-shadow: 0 0 3 white;
+    justify-content: flex-end;
+}
+.container.container textarea{
+  background-color: transparent;
+ color:lightgoldenrodyellow;
+
+}
+
+ textarea::-webkit-scrollbar {
+    width: 1em;
+}
+
+textarea::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset brown;
+}
+
+textarea::-webkit-scrollbar-thumb {
+  background-color: yellow;
+  outline: 1px solid brown;
+}
+.head1{
+  color:brown;
+  margin-left: 25rem;
+  margin-bottom: 3rem;
+  height: 10px;
+}

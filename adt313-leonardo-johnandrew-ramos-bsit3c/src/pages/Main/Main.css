@@ -1,3 +1,9 @@
+
+.Main a{
+color: lightgoldenrodyellow;
+font-size: small;
+
+}
 .Main {
   display: flex;
   overflow: hidden;
@@ -9,12 +15,13 @@
 }
 .Main .container .outlet {
   flex-grow: 3;
-  padding: 1rem;
+  padding: 2px ;
+  
 }
 .Main .container .navigation {
-  background-color: aliceblue;
+  background-color: black;
   padding-top: 40px;
-  height: 100vh;
+ height: 140vh;
 }
 .Main .container .navigation ul {
   list-style: none;
@@ -28,7 +35,7 @@
 }
 .Main .container .navigation ul li.active,
 .Main .container .navigation ul li:hover {
-  background: #ccc;
+  background: brown;
 }
 .Main .container .navigation ul li a {
   text-decoration: none;
