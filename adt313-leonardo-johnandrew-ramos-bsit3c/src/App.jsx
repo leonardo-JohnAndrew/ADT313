@@ -9,6 +9,7 @@ import Main from './pages/Main/Main';
 import Movie from './pages/Main/Movie/Movie';
 import Lists from './pages/Main/Movie/Lists/Lists';
 import Form from './pages/Main/Movie/Form/Form';
+import { UserProvider } from './context';
 
 const router = createBrowserRouter([
   {
@@ -23,11 +24,11 @@ const router = createBrowserRouter([
     path: '/main',
     element: <Main />,
     children: [
-      //Temporarily disabled the dashboard route
-      // {
-      //   path: '/main/dashboard',
-      //   element: <Dashboard />,
-      // },
+     
+      {
+        path: '/main/dashboard',
+        element: <Dashboard />,
+      },
       {
         path: '/main/movies',
         element: <Movie />,
@@ -48,9 +49,12 @@ const router = createBrowserRouter([
 
 function App() {
   return (
-    <div className='App'>
+    <UserProvider>
+       <div className='App'>
       <RouterProvider router={router} />
     </div>
+    </UserProvider>
+   
   );
 }
 

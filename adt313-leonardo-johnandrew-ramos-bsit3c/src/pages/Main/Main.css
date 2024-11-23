@@ -20,8 +20,15 @@ font-size: small;
 }
 .Main .container .navigation {
   background-color: black;
-  padding-top: 40px;
+  padding-top: 10px;
  height: 140vh;
+}
+.Main .container .navigation .username{ 
+  padding-bottom: 10px; 
+  font-size: large;
+  font-weight: 500; 
+  color: yellow;
+  
 }
 .Main .container .navigation ul {
   list-style: none;

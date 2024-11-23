@@ -1,10 +1,16 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useCallback, useEffect,useContext } from 'react';
 import './Login.css';
 import { useNavigate } from 'react-router-dom';
 import { useDebounce } from '../../../utils/hooks/useDebounce';
+import { UserContext } from '../../../context';
 import axios from 'axios';
+ 
+
 
 function Login() {
+    
+  const { setUsername } = useContext(UserContext);
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isFieldsDirty, setIsFieldsDirty] = useState(false);
@@ -58,7 +64,8 @@ function Login() {
       .then((res) => {
         console.log(res);
         localStorage.setItem('accessToken', res.data.access_token);
-        navigate('/main/movies');
+       setUsername(res.data.user.lastName)
+        navigate('/main/dashboard');
         setStatus('idle');
       })
       .catch((e) => {
