@@ -1,16 +1,12 @@
-import { useState, useRef, useCallback, useEffect,useContext } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import './Login.css';
 import { useNavigate } from 'react-router-dom';
 import { useDebounce } from '../../../utils/hooks/useDebounce';
-import { UserContext } from '../../../context';
 import axios from 'axios';
- 
-
+import { useUserContext } from '../../../context/UserContext';
 
 function Login() {
-    
-  const { setUsername } = useContext(UserContext);
-  
+  const {token, setToken} = useUserContext();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isFieldsDirty, setIsFieldsDirty] = useState(false);
@@ -20,7 +16,7 @@ function Login() {
   const userInputDebounce = useDebounce({ email, password }, 2000);
   const [debounceState, setDebounceState] = useState(false);
   const [status, setStatus] = useState('idle');
-
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleShowPassword = useCallback(() => {
@@ -47,31 +43,29 @@ function Login() {
   };
 
   const handleLogin = async () => {
-    const data = { email , password
-     };
+    const data = { email, password };
     setStatus('loading');
-    console.log(data);
 
     await axios({
       method: 'post',
       url: '/admin/login',
       data,
-      headers: {'Access-Control-Allow-Origin': '*'
-       }
-    
-      
+      headers: { 'Access-Control-Allow-Origin': '*' },
     })
       .then((res) => {
         console.log(res);
+        //store response access token to localstorage
         localStorage.setItem('accessToken', res.data.access_token);
-       setUsername(res.data.user.lastName)
-        navigate('/main/dashboard');
+        setToken(res.data.access_token)
+
+        navigate('/main/movies');
         setStatus('idle');
       })
       .catch((e) => {
+        setError(e.response.data.message);
         console.log(e);
         setStatus('idle');
-        alert(e.response.data.message);
+        // alert(e.response.data.message);
       });
   };
 
@@ -82,13 +76,14 @@ function Login() {
   return (
     <div className='Login'>
       <div className='main-container'>
-        <h3>Login</h3>   
         <form>
           <div className='form-container'>
+            <h3>Login</h3>
+
+            {error && <span className='login errors'>{error}</span>}
             <div>
               <div className='form-group'>
-                <label>E-mail:
-                </label>
+                <label>E-mail:</label>
                 <input
                   type='text'
                   name='email'
@@ -102,7 +97,7 @@ function Login() {
             </div>
             <div>
               <div className='form-group'>
-                <label>Password: </label>
+                <label>Password:</label>
                 <input
                   type={isShowPassword ? 'text' : 'password'}
                   name='password'
@@ -127,10 +122,7 @@ function Login() {
                     return;
                   }
                   if (email && password) {
-                    handleLogin({
-                      type: 'login',
-                      user: { email, password },
-                    });
+                    handleLogin();
                   } else {
                     setIsFieldsDirty(true);
                     if (email == '') {

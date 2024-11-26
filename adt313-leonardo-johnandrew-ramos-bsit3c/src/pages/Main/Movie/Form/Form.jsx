@@ -1,18 +1,20 @@
 import axios from 'axios';
 import { useCallback, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import './Form.css';
-import { useNavigate } from 'react-router-dom';
-import { eventWrapper } from '@testing-library/user-event/dist/utils';
+import { useUserContext } from '../../../../context/UserContext';
 const Form = () => {
+  const {token , setToken} = useUserContext();  //nandito ung token  para di ko na iget sa local storage
   const [query, setQuery] = useState('');
   const [searchedMovieList, setSearchedMovieList] = useState([]);
   const [selectedMovie, setSelectedMovie] = useState(undefined);
   const [movie, setMovie] = useState(undefined);
+  const [errors , setErrors] = useState({});
+  const navigate = useNavigate();
   let { movieId } = useParams();
   const [page, setPage] = useState(1);  // Add current page state
   const [totalPages, setTotalPages] = useState(1); 
-   const nav = useNavigate()
+  
   const handleSearch = useCallback(() => {
    
 
@@ -34,44 +36,34 @@ const Form = () => {
   const handleSelectMovie = (movie) => {
     setSelectedMovie(movie);
   };
+
   const handleNextPage = () => {
     if (page < totalPages) {
-      setPage((prevPage) => prevPage + 1);  
+      setPage((prevPage) => prevPage + 1); //pluss 1  
     }
   };
   
   const handlePreviousPage = () => {
     if (page > 1) {
-      setPage((prevPage) => prevPage - 1);  
+      setPage((prevPage) => prevPage - 1);   //minuss 1
     }
   };
-  
-
- const handletitlechange =(e) =>{
- setSelectedMovie(m =>({...m , original_title: e.target.value}))
- };
- const handleoverviewchange =(e) =>{
-  setSelectedMovie(m =>({...m , overview: e.target.value}))
-  }
-  useEffect(() => {
-      handleSearch();  
-    
-  },[page])
-
-  useEffect(() =>{
-      setPage(1)
-  },[query])
 
   const handleSave = () => {
-    const accessToken = localStorage.getItem('accessToken');
-    console.log(accessToken);
-    if (selectedMovie === undefined) {
+    console.log(token);
+    if (selectedMovie === undefined ) {
       //add validation
       alert('Please search and select a movie.');
-    } else {
+    } 
+    else if (!validateForm()) {
+            alert("Please fix the errors before save.");
+            return;
+            }
+    
+    else {
       const data = {
         tmdbId: selectedMovie.id,
-        title: selectedMovie.original_title,
+        title: selectedMovie.title,
         overview: selectedMovie.overview,
         popularity: selectedMovie.popularity,
         releaseDate: selectedMovie.release_date,
@@ -80,30 +72,72 @@ const Form = () => {
         posterPath: `https://image.tmdb.org/t/p/original/${selectedMovie.poster_path}`,
         isFeatured: 0,
       };
-   
-     
+
       const request = axios({
         method: 'post',
         url: '/movies',
         data: data,
         headers: {
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${token}`,
         },
       })
         .then((saveResponse) => {
           console.log(saveResponse);
-          alert('Success'); 
-           nav('/main/movies')
-      
+          alert('Success');
         })
         .catch((error) => console.log(error));
     }
   };
 
-
+  //create a form change/validation
+  const validateForm = () => {
+    const errorList = {};
+    if (!selectedMovie) errorList.selectedMovie = 'No movie selected.';
+    if (!selectedMovie?.original_title) errorList.title = 'Title is required.';
+    if (!selectedMovie?.overview) errorList.overview = 'Overview is required.';
+    // if (!selectedMovie?.popularity || isNaN(selectedMovie.popularity))
+    //   errorList.popularity = 'Popularity must be a valid number.';
+    if (!selectedMovie?.release_date)
+      errorList.release_date = 'Release date is required.';
+         else if (!/^\d{4}-\d{2}-\d{2}$/.test(selectedMovie.release_date)) {
+                 errorList.release_date = "Invalid format. Use YYYY-MM-DD.";
+                 }
+    // if (
+    //   !selectedMovie?.vote_average ||
+    //   isNaN(selectedMovie.vote_average) ||
+    //   selectedMovie.vote_average < 0 ||
+    //   selectedMovie.vote_average > 10
+    // )
+    //   errorList.voteAverage = 'Vote average must be a number between 0 and 10.';
+    setErrors(errorList);
+   
+    return Object.keys(errorList).length === 0;
+  
+  };
+  
+   const handletitlechange =(e) =>{
+    setSelectedMovie(m =>({...m , original_title: e.target.value}))
+    };
+   const handleoverviewchange =(e) =>{
+     setSelectedMovie(m =>({...m , overview: e.target.value}))
+    }
+  //  const handlepopularity = (e)=>{
+  //    setSelectedMovie(m =>({...m, popularity: e.target.value}))
+  //  }
+   const handlereleasedate = (e)=>{
+    setSelectedMovie(m => ({...m,release_date: e.target.value}))
+   }
+  
+  
+  //create a new handler for update
+  
   const handleupdate = () => {
-    const accessToken = localStorage.getItem('accessToken');
-    console.log(accessToken);
+    if (!validateForm()) {
+      alert("Please fix the errors before updating.");
+      return;
+    }
+  
+    console.log(token);
       const data = {
         tmdbId: selectedMovie.id,
         title: selectedMovie.original_title,
@@ -115,29 +149,37 @@ const Form = () => {
         posterPath: `https://image.tmdb.org/t/p/original/${selectedMovie.poster_path}`,
         isFeatured: 0,
       };
-   
+  
      
       const request = axios({
         method: 'patch',
       url: `/movies/${movieId} `,
         data: data,
         headers: {
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${token}`,
         },
       })
         .then((saveResponse) => {
           console.log(saveResponse);
           alert('Update Sucess'); 
-           nav('/main/movies')
+           navigate('/main/movies')
         
         })
         .catch((error) => console.log(error));
     
   };
-
-  //create a form change/validation
-//create update function 
+   
   useEffect(() => {
+    handleSearch();  //magsesearch sya pagnabago ung page
+  
+    },[page])
+ 
+   useEffect(() =>{
+      setPage(1)     //magrereset ung page number sa 1 pag bago ung query
+   },[query])
+
+  useEffect(() => {
+    setToken(token);
     if (movieId) {
       axios.get(`/movies/${movieId}`).then((response) => {
         setMovie(response.data);
@@ -152,48 +194,42 @@ const Form = () => {
         };
         setSelectedMovie(tempData);
         console.log(response.data);
-        
       });
-    } 
-   
+    }
   }, []);
 
   return (
     <>
-      <h1 className='head2'>{movieId !== undefined ? 'Edit ' : 'Create '} Movie</h1>
+      <h1>{movieId !== undefined ? 'Edit ' : 'Create '} Movie</h1>
 
       {movieId === undefined && (
         <>
-          <div className='search-container' >
-            <h6 className='title'> 
-              Search Movie:{' '}
+          <div className='search-container'>
+            Search Movie:{' '}
             <input
               type='text'
               onChange={(event) => setQuery(event.target.value)}
-              />
+            />
             <button type='button' onClick={handleSearch}>
               Search
             </button>
-              </h6>
             <div className='searched-movie'>
               {searchedMovieList.map((movie) => (
-                <p  className='list' onClick={() => handleSelectMovie(movie)}>
+                <p onClick={() => handleSelectMovie(movie)}>
                   {movie.original_title}
                 </p>
-              ))
-            }
-            <div className='page'>
-               <button onClick={handlePreviousPage} disabled={page === 1}>
-                 Previous
+              ))} 
+               <div className='page'>
+                 <button onClick={handlePreviousPage} disabled={page === 1}>
+                   Previous
+                 </button>
+                 <span className='page'>
+                 Page {page} of {totalPages}
+                 </span>
+                <button onClick={handleNextPage} disabled={page === totalPages}>
+                 Next
               </button>
-               <span className='page'>
-              Page {page} of {totalPages}
-               </span>
-              <button onClick={handleNextPage} disabled={page === totalPages}>
-              Next
-              </button>
-            </div>
-              
+             </div>
             </div>
           </div>
           <hr />
@@ -201,26 +237,23 @@ const Form = () => {
       )}
 
       <div className='container'>
-        <form >
-          <div className='image'>
-            
+        <form>
           {selectedMovie ? (
             <img
-            className='poster-image'
-            src={`https://image.tmdb.org/t/p/original/${selectedMovie.poster_path}`}
-            
+              className='poster-image'
+              src={`https://image.tmdb.org/t/p/original/${selectedMovie.poster_path}`}
             />
           ) : (
             ''
           )}
-          </div>
           <div className='field'>
             Title:
             <input
               type='text'
               value={selectedMovie ? selectedMovie.original_title : ''}
-              onChange={handletitlechange}
+              onChange ={handletitlechange}
             />
+            {errors.title && <span >{errors.title}</span>}
           </div>
           <div className='field'>
             Overview:
@@ -229,6 +262,7 @@ const Form = () => {
               value={selectedMovie ? selectedMovie.overview : ''}
               onChange={handleoverviewchange}
             />
+            {errors.overview}
           </div>
 
           <div className='field'>
@@ -244,7 +278,9 @@ const Form = () => {
             <input
               type='text'
               value={selectedMovie ? selectedMovie.release_date : ''}
+             onChange={handlereleasedate}
             />
+            {errors.release_date && <span>{errors.release_date}</span>}
           </div>
 
           <div className='field'>
@@ -255,11 +291,43 @@ const Form = () => {
             />
           </div>
 
-          <button type='button' onClick={movieId? handleupdate: handleSave   }>
+          <button type='button' onClick={movieId? handleupdate : handleSave}>
             Save
           </button>
         </form>
       </div>
+      {movieId !== undefined && selectedMovie && (
+        <div>
+          <hr />
+          <nav>
+            <ul className='tabs'>
+              <li
+                onClick={() => {
+                  navigate(`/main/movies/form/${movieId}/cast-and-crews`);
+                }}
+              >
+                Cast & Crews
+              </li>
+              <li
+                onClick={() => {
+                  navigate(`/main/movies/form/${movieId}/videos`);
+                }}
+              >
+                Videos
+              </li>
+              <li
+                onClick={() => {
+                  navigate(`/main/movies/form/${movieId}/photos`);
+                }}
+              >
+                Photos
+              </li>
+            </ul>
+          </nav>
+
+          <Outlet />
+        </div>
+      )}
     </>
   );
 };

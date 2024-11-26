@@ -2,13 +2,12 @@ import { useNavigate } from 'react-router-dom';
 import './Lists.css';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-
-
+import { useUserContext } from '../../../../context/UserContext';
 const Lists = () => {
- 
-  const accessToken = localStorage.getItem('accessToken');
+  const {token, setToken} = useUserContext();
   const navigate = useNavigate();
   const [lists, setLists] = useState([]);
+
   const getMovies = () => {
     //get the movies from the api or database
     axios.get('/movies').then((response) => {
@@ -17,6 +16,7 @@ const Lists = () => {
   };
   useEffect(() => {
     getMovies();
+    setToken(token)
   }, []);
 
   const handleDelete = (id) => {
@@ -27,7 +27,7 @@ const Lists = () => {
       axios
         .delete(`/movies/${id}`, {
           headers: {
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: `Bearer ${token}`,
           },
         })
         .then(() => {
@@ -38,7 +38,7 @@ const Lists = () => {
             tempLists.splice(index, 1);
             setLists(tempLists);
           }
-    
+
           //update list by requesting again to api
           // getMovies();
         });

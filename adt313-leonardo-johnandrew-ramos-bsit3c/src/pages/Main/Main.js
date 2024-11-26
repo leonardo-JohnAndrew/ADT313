@@ -1,46 +1,44 @@
-import { useContext, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import './Main.css';
-import { UserContext } from '../../context';
+import { useUserContext } from '../../context/UserContext';
 
 function Main() {
-  const {username} = useContext(UserContext)
-  const accessToken = localStorage.getItem('accessToken');
+  // const accessToken = localStorage.getItem('accessToken');
+   const {token , setToken} = useUserContext();
   const navigate = useNavigate();
   const handleLogout = () => {
     localStorage.removeItem('accessToken');
-    navigate('/');
+     setToken('');
+     navigate('/login')
   };
 
   useEffect(() => {
     if (
-      accessToken === undefined ||
-      accessToken === '' ||
-      accessToken === null
+      token === undefined ||
+      token === '' ||
+      token === null
     ) {
       handleLogout();
     }
   }, []);
   return (
     <div className='Main'>
-      <div className='container'>  
+      <div className='container'>
         <div className='navigation'>
           <ul>
-          <li>
-              <a href ='/main/profile' className='username'>{username}</a>
-            </li>
             <li>
-              <a href='/main/dashboard'>Dashboard</a>
+              <a onClick={() => navigate('/')}>Movies</a>
             </li>
-            <li>
-              <a href='/main/movies'>Movies</a>
-            </li>
-            <li>
-              <a href='/main/users'>Users</a>
-            </li>
-            <li className='logout'>
-              <a onClick={handleLogout}>Logout</a>
-            </li>
+            {token ? (
+              <li className='logout'>
+                <a onClick={handleLogout}>Logout</a>
+              </li>
+            ) : (
+              <li className='login'>
+                <a onClick={() => navigate('/login')}>Login</a>
+              </li>
+            )}
           </ul>
         </div>
         <div className='outlet'>

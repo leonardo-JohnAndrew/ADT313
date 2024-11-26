@@ -87,7 +87,7 @@ function Register() {
 
     await axios({
       method: 'post',
-      url: '/user/register',
+      url: '/admin/register',
       data,
       headers: {'Access-Control-Allow-Origin': '*'
        }
@@ -97,7 +97,7 @@ function Register() {
       .then((res) => {
         console.log(res);
         localStorage.setItem('accessToken', res.data.access_token);
-        navigate('/');
+        navigate('/main');
         setStatus('idle');
         alert('successfully created');
       })
