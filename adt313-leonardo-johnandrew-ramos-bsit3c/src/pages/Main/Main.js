@@ -21,7 +21,7 @@ function Main() {
     ) {
       handleLogout();
     }
-  }, []);
+  },[]);
   return (
     <div className='Main'>
       <div className='container'>

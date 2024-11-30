@@ -7,16 +7,62 @@
 }
 
 .poster-image {
-  width: 150px;
+  width: 50vh;
   height: auto;
+  margin-top: 15vh;
+  margin-bottom: 5vh;
+  z-index: 1;
+ 
 }
 
 .container {
-  overflow: auto;
+  position: relative;
+  width: 100vh; 
+  height: auto;
+  overflow: hidden;
+  display: flex;
+
+
+}
+
+.container .inputs {
+  margin-top: 15vh;
+  z-index: 1;
+}
+
+.container .movieContent {
+  position: relative;
+  padding: 8vh;
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  /* flex-direction: column; */
+  align-items: start;
+  /* border: 2px solid white; */
+
+}
+.container .inputs{
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+ /* flex-direction: column; */
+ /* border: 2px solid white; */
+ 
+}
+.container .backdrop{
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1; 
+  opacity: 0.4; 
+
 }
 
 nav {
-  margin-top: 2rem;
+  margin-top:1em;
+  
 }
 nav ul {
   list-style: none;
@@ -29,4 +75,64 @@ nav li {
   border: solid;
   border-width: 1px 1px 0 1px;
   margin: 0 5px 0 0;
+  
+}
+.Column {
+  display: flex;
+  flex-direction: column;
+  margin: 0 2em
+} 
+
+ .field input{
+  color: white;
+  background: rgba(71, 68, 68, 0.3); 
+  margin: .6em 0;
+  font-size:1.2em;
+  width: 20vh;
+ 
+  
+}
+  input:focus{
+  box-shadow: 0 0 10px gold; 
+  border-color: #66afe9;
+  
+
+}
+
+.container .inputs .field{
+  margin-right: 1rem;
+} 
+.others {
+  position: relative;
+  z-index: 10;
+ 
+}
+.others .field textarea{
+   /* margin-left: 20vh ; */
+   width: 100vh;
+   color: white;
+   background: rgba(0, 0, 0, 0.5); 
+   height: auto;
+   font-size: 1.3em;
+   text-align: justify;
+}
+textarea:focus{
+  box-shadow: 0 0 10px gold; 
+  border-color: #66afe9;
+  
+}
+ .save button{ 
+   background-color:  rgba(0, 0, 0, 0.5); 
+   color: white;
+   margin: 15vh 30vh;
+   width: 40vh;
+   height: 2rem;
+   
+}
+ .container .movieContent .Column .others .save button:hover{
+  background-color:  rgba(249, 249, 249, .5); 
+  color: black;
+  box-shadow: 0 0 10px gold; 
+  border-color: #66afe9;
+
 }

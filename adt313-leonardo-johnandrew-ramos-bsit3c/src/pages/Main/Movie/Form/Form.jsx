@@ -191,6 +191,7 @@ const Form = () => {
           poster_path: response.data.posterPath,
           release_date: response.data.releaseDate,
           vote_average: response.data.voteAverage,
+          backdrop_path: response.data.backdropPath,
         };
         setSelectedMovie(tempData);
         console.log(response.data);
@@ -238,35 +239,33 @@ const Form = () => {
 
       <div className='container'>
         <form>
+          <div className='movieContent'>
+            
+            <img className='backdrop' src={selectedMovie ? `https://image.tmdb.org/t/p/original/${selectedMovie.backdrop_path}`:"please Select A Movie"}></img>
           {selectedMovie ? (
             <img
               className='poster-image'
               src={`https://image.tmdb.org/t/p/original/${selectedMovie.poster_path}`}
-            />
-          ) : (
-            ''
-          )}
+              />
+            ) : (
+              ''
+            )}
+            <div className='Column'>
+
+            <div className='inputs'>
           <div className='field'>
-            Title:
-            <input
+          <h3>Title</h3> 
+            <input 
+           
               type='text'
               value={selectedMovie ? selectedMovie.original_title : ''}
               onChange ={handletitlechange}
             />
-            {errors.title && <span >{errors.title}</span>}
-          </div>
-          <div className='field'>
-            Overview:
-            <textarea
-              rows={10}
-              value={selectedMovie ? selectedMovie.overview : ''}
-              onChange={handleoverviewchange}
-            />
-            {errors.overview}
+            {errors.title && <span className= 'error' >{errors.title}</span>}
           </div>
 
           <div className='field'>
-            Popularity:
+           <h3>Popularity</h3>
             <input
               type='text'
               value={selectedMovie ? selectedMovie.popularity : ''}
@@ -274,26 +273,45 @@ const Form = () => {
           </div>
 
           <div className='field'>
-            Release Date:
+            <h3>Release Date:</h3>
             <input
               type='text'
               value={selectedMovie ? selectedMovie.release_date : ''}
              onChange={handlereleasedate}
-            />
-            {errors.release_date && <span>{errors.release_date}</span>}
+             />
+            {errors.release_date && <span className='error'>  {errors.release_date}</span>}
           </div>
 
           <div className='field'>
-            Vote Average:
+            <h3> Vote Average:</h3>
             <input
               type='text'
               value={selectedMovie ? selectedMovie.vote_average : ''}
-            />
+              />
           </div>
+      </div>
 
+         
+      <div className='others'>
+      <div className='field'>
+          <h3 className='overview'>{selectedMovie? selectedMovie.original_title: ""} </h3>
+            <textarea
+              rows={10}
+              value={selectedMovie ? selectedMovie.overview : ''}
+              onChange={handleoverviewchange}
+              />
+            {errors.overview && <span className='error'></span>}
+     </div>
+     <div className="save">
           <button type='button' onClick={movieId? handleupdate : handleSave}>
             Save
           </button>
+          </div>
+      </div>
+           </div>
+          </div>
+
+      
         </form>
       </div>
       {movieId !== undefined && selectedMovie && (
@@ -323,9 +341,11 @@ const Form = () => {
                 Photos
               </li>
             </ul>
+            
           </nav>
 
           <Outlet />
+        
         </div>
       )}
     </>

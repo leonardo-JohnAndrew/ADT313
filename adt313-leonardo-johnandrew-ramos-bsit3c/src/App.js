@@ -43,12 +43,12 @@ const router = createBrowserRouter([
             path: '/main/movies/form/:movieId?',
             element: <Form />,
             children: [
-              {
-                path: '/main/movies/form/:movieId',
-                element: (
-                  <h1>Change this for cast & crew CRUD functionality.</h1>
-                ),
-              },
+              // {
+              //   path: '/main/movies/form/:movieId',
+              //   element: (
+              //     <h1>Change this for cast & crew CRUD functionality.</h1>
+              //   ),
+              // },
               {
                 path: '/main/movies/form/:movieId/cast-and-crews',
                 element: (
