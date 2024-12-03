@@ -1,0 +1,57 @@
+.Mainadmin a{
+    color: lightgoldenrodyellow;
+    font-size: small;
+    
+    }
+    .Mainadmin {
+      display: flex;
+      overflow: hidden;
+      min-height: 100vh;
+    }
+    .Mainadmin .admincontainer {
+      display: flex;
+      width: 100vw;
+    }
+    .Mainadmin .admincontainer .outlet {
+      flex-grow: 3;
+      padding: 2px ;
+      overflow: scroll;
+    
+    }
+    .Mainadmin .admincontainer .adminnavigation {
+      background-color: black;
+      padding-top: 40px;
+      
+      margin-right: 2%;
+      box-shadow:  2px 5px 10px gold ;
+     height: 100%;
+    }
+    .Mainadmin .admincontainer .adminnavigation .username{ 
+      padding-bottom: 10px; 
+      font-size: large;
+      font-weight: 500; 
+      color: yellow;
+      
+    }
+    .Mainadmin .admincontainer .adminnavigation ul {
+      list-style: none;
+      overflow: hidden;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .Mainadmin .admincontainer .adminnavigation ul li {
+      padding: 10px 80px 10px 20px;
+    }
+    .Mainadmin .admincontainer .adminnavigation ul li.active,
+    .Mainadmin .admincontainer .adminnavigation ul li:hover {
+          border: 1px solid yellow;
+       
+    }
+    .Mainadmin .admincontainer .adminnavigation ul li a {
+      text-decoration: none;
+    }
+    
+    .Mainadmin .admincontainer .adminnavigation ul li.logout {
+      cursor: pointer;
+    }

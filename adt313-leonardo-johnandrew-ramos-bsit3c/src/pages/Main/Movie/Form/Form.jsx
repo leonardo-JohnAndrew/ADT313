@@ -3,8 +3,10 @@ import { useCallback, useEffect, useState } from 'react';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import './Form.css';
 import { useUserContext } from '../../../../context/UserContext';
+import CRUDReducer from '../Cast/Cast';
 const Form = () => {
-  const {token , setToken} = useUserContext();  //nandito ung token  para di ko na iget sa local storage
+  const { usertoken } = useUserContext();    //nandito ung token  
+  const {tmdbtoken, settmdbtoken} = useUserContext();
   const [query, setQuery] = useState('');
   const [searchedMovieList, setSearchedMovieList] = useState([]);
   const [selectedMovie, setSelectedMovie] = useState(undefined);
@@ -24,14 +26,16 @@ const Form = () => {
       headers: {
         Accept: 'application/json',
         Authorization:
-          'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI5YjQzNjY2ZDc0MWFhODBkM2ZlY2NkNDQxZWQ3ZjhiMSIsIm5iZiI6MTcyOTgzNDE0MC41NjI4NDUsInN1YiI6IjY3MWIxNjZjYjNkNWNiYjg0MmYzZmVjZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.b21GRdLZDQOx5wEwsLW3GyAogWEUd8p_ocPirIvoEpM'
+         `Bearer ${tmdbtoken}`
       },
     }).then((response) => {
       setSearchedMovieList(response.data.results);
           setTotalPages(response.data.total_pages);  
-      console.log(response.data.results);
+      console.log("result: ",response.data.results);
     });
   }, [query, page]);
+
+  
 
   const handleSelectMovie = (movie) => {
     setSelectedMovie(movie);
@@ -50,7 +54,7 @@ const Form = () => {
   };
 
   const handleSave = () => {
-    console.log(token);
+    
     if (selectedMovie === undefined ) {
       //add validation
       alert('Please search and select a movie.');
@@ -72,13 +76,14 @@ const Form = () => {
         posterPath: `https://image.tmdb.org/t/p/original/${selectedMovie.poster_path}`,
         isFeatured: 0,
       };
-
+          
+      console.log("maydata: ",data , usertoken)
       const request = axios({
         method: 'post',
         url: '/movies',
         data: data,
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${usertoken}`,
         },
       })
         .then((saveResponse) => {
@@ -137,7 +142,7 @@ const Form = () => {
       return;
     }
   
-    console.log(token);
+
       const data = {
         tmdbId: selectedMovie.id,
         title: selectedMovie.original_title,
@@ -153,10 +158,10 @@ const Form = () => {
      
       const request = axios({
         method: 'patch',
-      url: `/movies/${movieId} `,
+      url: `movies/${movieId} `,
         data: data,
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${usertoken}`,
         },
       })
         .then((saveResponse) => {
@@ -179,7 +184,7 @@ const Form = () => {
    },[query])
 
   useEffect(() => {
-    setToken(token);
+ 
     if (movieId) {
       axios.get(`/movies/${movieId}`).then((response) => {
         setMovie(response.data);
@@ -314,28 +319,30 @@ const Form = () => {
       
         </form>
       </div>
-      {movieId !== undefined && selectedMovie && (
+     
+      {movieId !== undefined && selectedMovie && ( 
+
         <div>
           <hr />
           <nav>
             <ul className='tabs'>
               <li
                 onClick={() => {
-                  navigate(`/main/movies/form/${movieId}/cast-and-crews`);
+                  navigate(`/main/admin/movies/form/${movieId}/cast-and-crews`);
                 }}
               >
                 Cast & Crews
               </li>
               <li
                 onClick={() => {
-                  navigate(`/main/movies/form/${movieId}/videos`);
+                  navigate(`/main/admin/movies/form/${movieId}/videos`);
                 }}
               >
                 Videos
               </li>
               <li
                 onClick={() => {
-                  navigate(`/main/movies/form/${movieId}/photos`);
+                  navigate(`/main/admins/movies/form/${movieId}/photos`);
                 }}
               >
                 Photos

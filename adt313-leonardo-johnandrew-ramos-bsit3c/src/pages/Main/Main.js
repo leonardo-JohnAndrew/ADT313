@@ -5,22 +5,18 @@ import { useUserContext } from '../../context/UserContext';
 
 function Main() {
   // const accessToken = localStorage.getItem('accessToken');
-   const {token , setToken} = useUserContext();
+   const {usertoken} = useUserContext();
   const navigate = useNavigate();
   const handleLogout = () => {
     localStorage.removeItem('accessToken');
-     setToken('');
      navigate('/login')
   };
 
   useEffect(() => {
-    if (
-      token === undefined ||
-      token === '' ||
-      token === null
-    ) {
+    if (!usertoken){
       handleLogout();
     }
+
   },[]);
   return (
     <div className='Main'>
@@ -30,7 +26,7 @@ function Main() {
             <li>
               <a onClick={() => navigate('/')}>Movies</a>
             </li>
-            {token ? (
+            {usertoken ? (
               <li className='logout'>
                 <a onClick={handleLogout}>Logout</a>
               </li>

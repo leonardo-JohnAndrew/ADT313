@@ -12,6 +12,9 @@ import Form from './pages/Main/Movie/Form/Form';
 import Register from './pages/Public/Register/Register';
 import Cast from './pages/Main/Movie/Cast/Cast';
 import UserContextProvider from './context/UserContext';
+import Dashboard from './pages/Main/Dashboard/Dashboard';
+import Mainadmin from './pages/Main/Mainadmin';
+
 const router = createBrowserRouter([
 
   {
@@ -23,24 +26,24 @@ const router = createBrowserRouter([
    element:<Register />
   },
   {
-    path: '/main',
-    element: <Main />,
+    path: '/main/admin',
+    element: < Mainadmin/>,
     children: [
-      //Temporarily disabled the dashboard route
-      // {
-      //   path: '/main/dashboard',
-      //   element: <Dashboard />,
-      // },
+      // Temporarily disabled the dashboard route
       {
-        path: '/main/movies',
+        path: '/main/admin/dashboard',
+        element: <Dashboard />,
+      },
+      {
+        path: '/main/admin/movies',
         element: <Movie />,
         children: [
           {
-            path: '/main/movies',
+            path: '/main/admin/movies',
             element: <Lists />,
           },
           {
-            path: '/main/movies/form/:movieId?',
+            path: '/main/admin/movies/form/:movieId?',
             element: <Form />,
             children: [
               // {
@@ -50,20 +53,20 @@ const router = createBrowserRouter([
               //   ),
               // },
               {
-                path: '/main/movies/form/:movieId/cast-and-crews',
+                path: '/main/admin/movies/form/:movieId/cast-and-crews',
                 element: (
                 
                   <Cast />
                 ),
               },
               {
-                path: '/main/movies/form/:movieId/photos',
+                path: '/main/admin/movies/form/:movieId/photos',
                 element: (
                   <h1>Change this for photos CRUD functionality component.</h1>
                 ),
               },
               {
-                path: '/main/movies/form/:movieId/videos',
+                path: '/main/admin/movies/form/:movieId/videos',
                 element: (
                   <h1>Change this for videos CRUD functionality component.</h1>
                 ),

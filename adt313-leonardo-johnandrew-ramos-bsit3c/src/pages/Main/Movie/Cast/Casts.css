@@ -1,0 +1,22 @@
+.table{
+    width: 100%;
+}
+
+.table td{
+}
+ .profile{
+    width: 70%;
+    height: 5em;
+    padding-left: 15%;
+
+}
+#dburl {
+
+    width: 70%;
+    height: 5em;
+    padding-left: 15%;
+}
+ button  {
+background-color: aqua;
+margin-left: 25%;
+}

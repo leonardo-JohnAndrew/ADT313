@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useUserContext } from '../../../../context/UserContext';
 const Lists = () => {
   const {token, setToken} = useUserContext();
+  const {tmdbtoken, settmdbtoken} = useUserContext();
   const navigate = useNavigate();
   const [lists, setLists] = useState([]);
 
@@ -15,8 +16,7 @@ const Lists = () => {
     });
   };
   useEffect(() => {
-    getMovies();
-    setToken(token)
+   getMovies();
   }, []);
 
   const handleDelete = (id) => {
@@ -51,7 +51,7 @@ const Lists = () => {
         <button
           type='button'
           onClick={() => {
-            navigate('/main/movies/form');
+            navigate('/main/admin/movies/form');
           }}
         >
           Create new
@@ -75,7 +75,7 @@ const Lists = () => {
                   <button
                     type='button'
                     onClick={() => {
-                      navigate('/main/movies/form/' + movie.id);
+                      navigate('/main/admin/movies/form/' + movie.id);
                     }}
                   >
                     Edit
