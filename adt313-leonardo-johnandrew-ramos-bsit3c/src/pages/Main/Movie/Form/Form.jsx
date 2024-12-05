@@ -4,13 +4,14 @@ import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import './Form.css';
 import { useUserContext } from '../../../../context/UserContext';
 import CRUDReducer from '../Cast/Cast';
+import { useMovieContext } from '../../../../context/MovieContext';
 const Form = () => {
   const { usertoken } = useUserContext();    //nandito ung token  
   const {tmdbtoken, settmdbtoken} = useUserContext();
   const [query, setQuery] = useState('');
   const [searchedMovieList, setSearchedMovieList] = useState([]);
   const [selectedMovie, setSelectedMovie] = useState(undefined);
-  const [movie, setMovie] = useState(undefined);
+  const { setMovie} = useMovieContext();
   const [errors , setErrors] = useState({});
   const navigate = useNavigate();
   let { movieId } = useParams();
@@ -342,7 +343,7 @@ const Form = () => {
               </li>
               <li
                 onClick={() => {
-                  navigate(`/main/admins/movies/form/${movieId}/photos`);
+                  navigate(`/main/admin/movies/form/${movieId}/photos`);
                 }}
               >
                 Photos

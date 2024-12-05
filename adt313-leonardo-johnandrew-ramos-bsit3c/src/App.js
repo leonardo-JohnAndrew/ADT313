@@ -14,6 +14,8 @@ import Cast from './pages/Main/Movie/Cast/Cast';
 import UserContextProvider from './context/UserContext';
 import Dashboard from './pages/Main/Dashboard/Dashboard';
 import Mainadmin from './pages/Main/Mainadmin';
+import Photos from './pages/Main/Movie/Photos/Photos';
+import Videos from './pages/Main/Movie/Videos/Videos';
 
 const router = createBrowserRouter([
 
@@ -62,13 +64,13 @@ const router = createBrowserRouter([
               {
                 path: '/main/admin/movies/form/:movieId/photos',
                 element: (
-                  <h1>Change this for photos CRUD functionality component.</h1>
+                     <Photos />
                 ),
               },
               {
                 path: '/main/admin/movies/form/:movieId/videos',
                 element: (
-                  <h1>Change this for videos CRUD functionality component.</h1>
+                    <Videos />
                 ),
               },
             ],

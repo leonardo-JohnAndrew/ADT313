@@ -5,18 +5,18 @@
 .table td{
 }
  .profile{
+    width: 30%;
+    height: 2em;
+    padding-left:  35%;
+
+}
+/* #dburl {
+
     width: 70%;
     height: 5em;
     padding-left: 15%;
+} */
 
-}
-#dburl {
-
-    width: 70%;
-    height: 5em;
-    padding-left: 15%;
-}
- button  {
-background-color: aqua;
-margin-left: 25%;
+.savebutton{
+margin-left:15%;
 }

@@ -3,6 +3,9 @@ import { useEffect, useReducer, useState, useCallback } from "react";
 import { useUserContext } from "../../../../context/UserContext";
 import { useParams } from "react-router-dom"; 
 import './Casts.css'
+import { useMovieContext } from "../../../../context/MovieContext";
+import Movie from "../Movie";
+
 
 const initial = {
     items: [],
@@ -69,20 +72,79 @@ const CRUDcrewandcast = () => {
     
     const [state, dispatch] = useReducer(reducer, initial);
     const { tmdbtoken, usertoken, userInfo } = useUserContext();
-    const [movie , setMovie] = useState();
+    const {movie , setMovie} = useMovieContext();
     const { movieId } = useParams();
     const [castCrewResults, setCastCrewResults] = useState({ cast: [], crew: [] });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-    const [editCast, setEditCast] = useState(null);
+    const [currentPagecrew, setCurrentPagecrew] = useState(1);
+    const [itemsPerPage] = useState(20);
+    const [currentPagecast, setCurrentPagecast] = useState(1);
+    const [currentPagedb, setCurrentPagedb] = useState(1);
+    
+    const [editCast , setEditCast] = useState(null);
+    const lastcast = currentPagecast * itemsPerPage ;
+    const firstcast = lastcast - itemsPerPage;
+    const lastcrew =currentPagecrew * itemsPerPage ;
+    const firstcrew = lastcrew -itemsPerPage ;
+
+     
+
+    //filter 
+    const filter = (list) => {
+        return list.filter((person) => {
+            return !state.items.some(
+                (item) =>
+                    item.name === person.name &&
+                    (item.characterName === (person.character || person.job))
+            );
+        });
+    };
+     
+
+     const filteredcast = filter(castCrewResults.cast);
+     const filteredcrew = filter(castCrewResults.crew);
+    //filtered cast
+    const castvalue = filteredcast.slice(firstcast, lastcast);
+    //filteredd cast
+    const crewvalue = filteredcrew.slice(firstcrew,lastcrew);
+    //filters db
+    // const dbvalue =  state.items.slice(first,last)
+  
+    const btncountcast = []
+    for (let c = 1 ; c<Math.ceil(filteredcast.length/itemsPerPage);c++){
+        btncountcast.push(c);
+    }
+    
+    const btncountcrew = []
+    for (let c = 1 ; c<Math.ceil(filteredcrew.length/itemsPerPage);c++){
+        btncountcrew.push(c);
+    }
+    const btncountdb = []
+    for (let c = 1 ; c<Math.ceil(state.items.length/itemsPerPage);c++){
+        btncountdb.push(c);
+    }
+
+   
+    // console.log(castvalue);
 //    alert(userInfo.userId);
+      const crewclick =(i)=>{
+        setCurrentPagecrew(i);
+      }
+      const castclick = (i)=>{
+         setCurrentPagecast(i);
+      }
+      const dbclick = (i)=>{
+        setCurrentPagedb(i);
+      }
+
     const fetchCastCrew = useCallback(() => {
         if(!state.tmdbId) return ;
         setLoading(true);
         setError("");
         axios({
             method: "get",
-            url: `https://api.themoviedb.org/3/movie/${state.tmdbId}/credits`,
+            url: `https://api.themoviedb.org/3/movie/${movie.tmdbId}/credits`,
             headers: {
                 Accept: "application/json",
                 Authorization: `Bearer ${tmdbtoken}`,
@@ -111,9 +173,12 @@ const CRUDcrewandcast = () => {
                 dispatch({ type: actions.FETCH_SUCCESS, payload: data , id: res.data.tmdbId});
             })
             .catch((err) => {
-                dispatch({ type: actions.FETCH_ERROR, payload: err.message });
             });
     }, [movieId]);
+
+ useEffect(()=>{
+    read()
+ },[state.items])
 
     const handlesave = async (person, isCast = true) => {
         const newEntry = {
@@ -127,7 +192,7 @@ const CRUDcrewandcast = () => {
         };
            
         try {
-            const res = await axios.post("/casts", newEntry, {
+            const res = await axios.post("/admin/casts", newEntry, {
                 headers: {
                     Authorization: `Bearer ${usertoken}`,
                 },
@@ -145,7 +210,14 @@ const CRUDcrewandcast = () => {
         if (!editCast) return;
 
         try {
-            const res = await axios.put(`/casts/${editCast.id}`, editCast, {
+            const data = {
+                movieId: editCast.movieId,
+                name : editCast.name ,
+                characterName:editCast.characterName,
+                url:"",
+
+            }
+            const res = await axios.post(`/admin/casts/${editCast.id}`, data, {
                 headers: { Authorization: `Bearer ${usertoken}` },
             });
             dispatch({ type: actions.UPDATE_CAST, payload: res.data });
@@ -181,7 +253,8 @@ const CRUDcrewandcast = () => {
 
     return (
         <div>
-            <h2>Search Results for Cast & Crew</h2>
+
+            <h2>Suggested Cast & Crew</h2>
             {loading && <p>Loading...</p>}
             {error && <p style={{ color: "red" }}>{error}</p>}
             <div>
@@ -196,22 +269,32 @@ const CRUDcrewandcast = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {castCrewResults.cast.map((person) => (
+                        {castvalue.map((person) => (
                             <tr >
                                  <td><img src= {`https://image.tmdb.org/t/p/w500${person.profile_path}`}   alt="none" className="profile" /></td>
                                 <td>{person.name}</td>
                                 <td>{person.character}</td>
                                 <td>
-                                    <button  onClick={() => handlesave(person, true)} >
+                                    <button  className="savebutton" onClick={() => handlesave(person, true)} >
                                         Add Cast
                                     </button>
                                 </td>
                             </tr>
                         ))}
+
                     </tbody>
+
                 </table>
+                    {btncountcast.map((bt)=>(
+                        <button onClick={()=>castclick(bt)}>{bt}</button>
+                    ))}
+                <div>
+              
             </div>
+            </div>
+              
             <div>
+
                 <h3>Crew</h3>
                 <table border="1" className="table" >
                     <thead>
@@ -223,13 +306,13 @@ const CRUDcrewandcast = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {castCrewResults.crew.map((person) => (
+                        {crewvalue.map((person) => (
                             <tr >
                                   <td><img src= {`https://image.tmdb.org/t/p/w500${person.profile_path}`}   alt="none"  className="profile" /></td>
                                 <td>{person.name}</td>
                                 <td>{person.job}</td>
                                 <td>
-                                    <button  onClick={() => handlesave(person, false)}>
+                                    <button className="savebutton"  onClick={() => handlesave(person, false)}>
                                         Add Crew
                                     </button>
                                 </td>
@@ -238,6 +321,9 @@ const CRUDcrewandcast = () => {
                     </tbody>
                 </table>
             </div>
+             {btncountcrew.map((btn)=>(
+                  <button onClick={()=>crewclick(btn)}>{btn}</button>
+             ))}
             <h2>Database Casts</h2>
             <table border="1" className="table"> 
                 <thead>
@@ -258,7 +344,7 @@ const CRUDcrewandcast = () => {
                                   
                                  />
                                 ):(
-                                    <img  id = "dburl" src= {`https://image.tmdb.org/t/p/w500${item.url}`}   alt="none" />
+                                    <img  className="profile" src= {`https://image.tmdb.org/t/p/w500${item.url}`}   alt="none" />
                                 )}
                             </td>
                             <td>
@@ -301,6 +387,9 @@ const CRUDcrewandcast = () => {
                     ))}
                 </tbody>
             </table>
+            {btncountdb.map((btn)=>(
+                  <button className="savebutton" onClick={()=>dbclick(btn)}>{btn}</button>
+             ))}
         </div>
     );
 };

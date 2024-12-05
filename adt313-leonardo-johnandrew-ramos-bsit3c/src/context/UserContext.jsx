@@ -19,6 +19,8 @@ function UserContextProvider({ children }) {
       localStorage.setItem('userInfo',JSON.stringify(userInfo))
     }
    },[userInfo])
+
+ 
   useEffect(() => {
     if (usertoken) {
       localStorage.setItem('accessToken', usertoken); 
@@ -28,7 +30,7 @@ function UserContextProvider({ children }) {
  const login = ( newUserInfo) =>{
   setUserInfo(newUserInfo);
   localStorage.setItem('userInfo', JSON.stringify(newUserInfo));
-  console.log(newUserInfo);
+  // console.log(newUserInfo);
  }
 
  const logout =() =>{
