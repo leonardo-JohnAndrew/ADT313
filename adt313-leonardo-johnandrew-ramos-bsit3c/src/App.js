@@ -16,9 +16,13 @@ import Dashboard from './pages/Main/Dashboard/Dashboard';
 import Mainadmin from './pages/Main/Mainadmin';
 import Photos from './pages/Main/Movie/Photos/Photos';
 import Videos from './pages/Main/Movie/Videos/Videos';
+import UpdatePhoto from './pages/Main/Movie/Cast/try';
 
 const router = createBrowserRouter([
-
+  {
+  path:'/try',
+  element:<UpdatePhoto />
+  },
   {
     path: '/login',
     element: <Login />,

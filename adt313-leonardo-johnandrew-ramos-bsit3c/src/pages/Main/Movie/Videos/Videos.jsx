@@ -81,6 +81,7 @@ const Videos = () =>{
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [id] = useState(4)
     //   alert(movie.tmdbId)
     const fetchphoto = useCallback(() =>{
         
@@ -156,14 +157,43 @@ const Videos = () =>{
 
     useEffect(()=>{
         fetchphoto()
-        console.log(state.items)
+      
     },[])
-
+    
+    const handleUpdate = async () => {
+        const data = { 
+            movieId: "30",
+            name: "named",
+            url: "ul",
+            site: "dd",
+            videoKey: "dsfj",
+            videoType: "jdfi",
+            official: false,
+       
+        };
+    
+        try {
+            const res = await axios.patch(`/videos/${id}`, data, {
+                headers: {
+                    Authorization: `Bearer ${usertoken}`,
+                    Accept: "application/json",
+                },
+            });
+            alert("Updated successfully!");
+        } catch (error) {
+            console.error("Error updating video:", error.response.data);
+            alert("Failed to update video.");
+        }
+    };
+    
     return(
         <>
-
+         <h4 style={
+             {
+                color: "lightyellow"
+             }
+         }>This is the suggested Video click add to save </h4>
       <div className="video-container">
-     
     {state.loading && <p>Loading...</p>}
     {state.error && <p>Error: {state.error}</p>}
 
@@ -198,6 +228,7 @@ const Videos = () =>{
     ))}
 </div>
         {/* {JSON.stringify(state.items)} */}
+        <button className="update" onClick={()=>{handleUpdate()}}>update</button>
         </>
     );
 };

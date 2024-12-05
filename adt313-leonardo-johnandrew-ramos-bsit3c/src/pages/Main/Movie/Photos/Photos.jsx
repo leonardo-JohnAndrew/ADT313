@@ -78,8 +78,10 @@ const Photos = () =>{
     const {movie , setMovie}= useMovieContext();
     const { movieId } = useParams();
     const [photos, setPhotos] = useState({ posters: [], backdrops: [] });
+    const [editInfo, setEditIndfo] = useState(null)
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const[id] =useState(5)
     // alert(movie.tmdbId)
     const fetchphoto = useCallback(() =>{ 
         
@@ -150,10 +152,37 @@ const Photos = () =>{
  useEffect(()=>{
     read()
  },[state.items])
+ const handleUpdate = async () => {
+    const data = {
+        userId: userInfo.userId,
+        movieId: movieId,
+        description: "Updated description",
+        url: "Updated URL",
+    };
+
+    try {
+        const res = await axios.patch(`/photos/2`, data, {
+            headers: {
+                Authorization: `Bearer ${usertoken}`,
+                Accept: "application/json",
+            },
+        });
+        alert("Updated successfully!");
+    } catch (error) {
+        console.error("Error updating photo:", error.response.data);
+        alert("Failed to update photo.");
+    }
+};
+
 
 
     return(
         <> 
+          <h4 style={
+             {
+                color: "lightyellow"
+             }
+         }>This is the suggested Video click add to save </h4>
         <div className="photos-container" >
             {state.loading && <p>Loading...</p>}
             {state.error && <p>Error: {state.error}</p>}
@@ -185,6 +214,12 @@ const Photos = () =>{
                 </div>
             ))}
         </div>
+        <h4 style={
+             {
+                color: "lightyellow"
+             }
+         }>This is my current photo list   </h4>
+         <button onClick={()=>{handleUpdate()}}>update</button>
         </>
     );
 };
