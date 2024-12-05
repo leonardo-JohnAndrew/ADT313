@@ -10,7 +10,7 @@ const initial = {
     items :[],
     loading: false ,
     error: null,
-    tmbId: null
+  
 };
 
 const actions = {
@@ -37,8 +37,8 @@ const reducer = (state , action) =>{
                 ...state,
                  loading: 
                  false,
-                items: action.payload,
-                tmdbId: action.id
+                items: action.payload
+            
             
                 };
         case actions.FETCH_ERROR:
@@ -77,7 +77,7 @@ const Videos = () =>{
     const { tmdbtoken, usertoken, userInfo } = useUserContext();
     const  {movie } = useMovieContext(); 
     const { movieId } = useParams();
-    const [video, setVideos] = useState({
+    const [video, setVideos] = useState({ video : []
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -95,9 +95,10 @@ const Videos = () =>{
             },
         })
             .then((res) => {
-                //  console.log("viesssssadios",res.data);
-                  dispatch({ type: actions.FETCH_SUCCESS, payload: res.data.results });
-                
+                setVideos({
+                    video:res.data.results|| []
+                  
+                 });
                
             })
             .catch((err) => {
@@ -105,22 +106,71 @@ const Videos = () =>{
                 console.error(err);
             })
             .finally(() => setLoading(false));
-    } ,[])
+    } ,[movie,movieId,tmdbtoken])
+   
+
+    const handlesave = async (video) => {
+            
+        const newEntry= {
+            userId: userInfo.userId,
+            movieId: movieId,
+            url:  video.key? `https://www.youtube.com/embed/${video.key}`: 'no url',
+            name: video.name ,
+            site: video.site,
+            videoType:video.type,
+            videoKey:video.key,
+            official: video.official
+            
+        };
+        try {
+            const res = await axios.post("/admin/videos", newEntry, {
+                headers: {
+                    Authorization: `Bearer ${usertoken}`,
+                },
+            });
+            dispatch({ type: actions.CREATE, payload: res.data });
+            alert("Added  Photo Successfully!");
+        } catch (error) {
+            console.error("Error adding to database:", error.message);
+            alert("Failed to add to database.");
+        }
+     
+    };
+
+    const read = useCallback(() => {
+        dispatch({ type: actions.FETCH_REQUEST });
+        axios
+            .get(`/movies/${movieId}`)
+            .then((res) => {    
+                const data = Array.isArray(res.data.casts) ? res.data.casts : [res.data.casts];
+                dispatch({ type: actions.FETCH_SUCCESS, payload: data , id: res.data.tmdbId});
+            })
+            .catch((err) => {
+            });
+    }, [movieId]);
+
+ useEffect(()=>{
+    read()
+ },[state.items])
+
 
     useEffect(()=>{
         fetchphoto()
+        console.log(state.items)
     },[])
+
     return(
-   
         <>
-        {/* {JSON.stringify(state.items)} */}
+
       <div className="video-container">
+     
     {state.loading && <p>Loading...</p>}
     {state.error && <p>Error: {state.error}</p>}
-    {state.items.map((item, index) => (
+
+    {video.video.map((item) => (
         
             <div
-                key={index}
+           
                 className="video-card"
                 onMouseEnter={(e) => {
                     e.currentTarget.querySelector(".info").style.display = "block";
@@ -141,6 +191,7 @@ const Videos = () =>{
                     <p>Type: {item.type}</p>
                     <p>official:{item.official==='false'? "True":"False"}</p>
                     <p>Site:{item.site}</p>
+                    <button className="savebutton" onClick={()=>{ handlesave(item)}}> add</button>
                 </div>
             </div>
         

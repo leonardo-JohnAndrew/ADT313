@@ -9,8 +9,7 @@ import './Photos.css'
 const initial = {
     items :[],
     loading: false ,
-    error: null,
-    tmbId: null
+    error: null
 };
 
 const actions = {
@@ -37,9 +36,8 @@ const reducer = (state , action) =>{
                 ...state,
                  loading: 
                  false,
-                items: action.payload,
-                tmdbId: action.id
-            
+                items: action.payload
+      
                 };
         case actions.FETCH_ERROR:
             return { 
@@ -50,6 +48,7 @@ const reducer = (state , action) =>{
         case actions.CREATE:
             return { 
                 ...state, 
+                 loading:false,
                 items: [...state.items, action.payload] 
             };
         case actions.UPDATE:
@@ -78,8 +77,7 @@ const Photos = () =>{
     const { tmdbtoken, usertoken, userInfo } = useUserContext();
     const {movie , setMovie}= useMovieContext();
     const { movieId } = useParams();
-    const [photos, setphotos] = useState({
-    });
+    const [photos, setPhotos] = useState({ posters: [], backdrops: [] });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     // alert(movie.tmdbId)
@@ -96,10 +94,11 @@ const Photos = () =>{
             },
         })
             .then((res) => {
+                setPhotos({
+                   posters:res.data.posters|| [],
+                   backdrops: res.data.backdrops|| [],
+                });
                  console.log(res.data);
-                 dispatch({ type: actions.FETCH_SUCCESS, payload: res.data.backdrops });
-             
-               
             })
             .catch((err) => {
                 setError("Failed to fetch cast and crew.");
@@ -111,39 +110,54 @@ const Photos = () =>{
     useEffect(()=>{
         fetchphoto()
     },[])
-
-    const handlesave = async (person, isCast = true) => {
+    
+    const handlesave = async (image , backdrops= true) => {
+            
         const newEntry= {
             useId :userInfo.userId ,
             movieId:movieId ,
-            name: person.name,
-            characterName: isCast ? person.character : person.job,
-            url: person.profile_path
-                ? `https://image.tmdb.org/t/p/w500${person.profile_path}`
-                : "",
-        };
+            description: backdrops? 'Backdrop': 'Poster',
+            url :image.file_path?   `https://image.tmdb.org/t/p/original${image.file_path}`:'no url',
            
+        };
         try {
-            const res = await axios.post("/admin/casts", newEntry, {
+            const res = await axios.post("/admin/photos", newEntry, {
                 headers: {
                     Authorization: `Bearer ${usertoken}`,
                 },
             });
-            dispatch({ type: actions.CREATE_CAST, payload: res.data });
-            alert("Added successfully!");
+            dispatch({ type: actions.CREATE, payload: res.data });
+            alert("Added  Photo Successfully!");
         } catch (error) {
             console.error("Error adding to database:", error.message);
             alert("Failed to add to database.");
         }
      
     };
+    const read = useCallback(() => {
+        dispatch({ type: actions.FETCH_REQUEST });
+        axios
+            .get(`/movies/${movieId}`)
+            .then((res) => {
+                 
+                const data = Array.isArray(res.data) ? res.data.photos : [res.data.photos];
+                dispatch({ type: actions.FETCH_SUCCESS, payload: data  });
+            })
+            .catch((err) => {
+            });
+    }, [movieId]);
+
+ useEffect(()=>{
+    read()
+ },[state.items])
+
 
     return(
         <> 
         <div className="photos-container" >
             {state.loading && <p>Loading...</p>}
             {state.error && <p>Error: {state.error}</p>}
-            {state.items.map((item, index) => (
+            {photos.backdrops.map((item, index) => (
                 <div
                     key={index}
                     className="photo-card"
@@ -164,7 +178,7 @@ const Photos = () =>{
                     />
                     <div className="info" >
                         <p>URL: {`https://image.tmdb.org/t/p/original${item.file_path}`}</p>
-                         <button className="savebutton"   >Add</button>
+                         <button className="savebutton"  onClick={() => handlesave(item,true)} >Add</button>
                    
                     </div>
                     
