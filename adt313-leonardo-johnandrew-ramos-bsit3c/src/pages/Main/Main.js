@@ -11,6 +11,13 @@ function Main() {
     localStorage.removeItem('accessToken');
      navigate('/login')
   };
+  
+const rolecheck = () => {
+    if (userInfo.role === 'admin'){
+          navigate('/main/admin')
+     }
+}
+
 
   useEffect(() => {
     if (!usertoken ){
@@ -19,9 +26,8 @@ function Main() {
     if(userInfo === null){
       handleLogout();
     }
-    
-
-  },[]);
+  rolecheck();
+  },[]); //ONCE LNG
      
   return (
     <div className='Main'>

@@ -1,30 +1,64 @@
 .featured-movie-container {
+  overflow: scroll;
 }
 .page-title {
   font-size: 4.5rem;
 }
 .list-container {
+  margin-top: 4rex;
   display: flex;
   flex-wrap: wrap;
-  flex: 1;
+ 
+   height: 100vh;
   gap: 1rem;
+  justify-content: center;
+
+
 }
 
 .featured-list-container {
   width: 100%;
-  margin-bottom: 5rem;
-  aspect-ratio: 16 / 9;
+  margin-bottom: 3rem;
+  aspect-ratio:16/9;
+  position:relative;
 }
 .featured-backdrop {
   height: 100%;
   width: 100%;
-  background-size: cover !important;
+  background-size: cover !important ;
   display: flex;
   align-items: end;
+  position: relative;
+
 }
 .featured-movie-title {
   font-weight: bold;
-  font-size: 3rem;
-  width: 100%;
-  padding: 2rem;
+  font-size: 1rem;
+  margin-left: 3em;
+   margin-bottom: 9em;
+  box-shadow: 2px 3px 5px yellow;
+  padding: 10px;
+  background: goldenrod 
+}
+.description {
+  width: 70%;
+  color: white;
+  background: rgba(0, 0, 0, 0.2); 
+  height: 20vh;
+  font-size: 1.3em;
+  text-align: justify;
+  margin-bottom: 2.7em;
+  margin-left: 10px;
+  border: none;
+  outline: none;
+}
+.heading {
+  width: 300px; 
+  height: 400px; 
+  position: relative;
+  display: flex;
+  justify-content: center;
+  background-color: rgb(15, 15, 15);
+  border-radius: 6px;
+  box-shadow: 2px 3px 5px yellow;
 }

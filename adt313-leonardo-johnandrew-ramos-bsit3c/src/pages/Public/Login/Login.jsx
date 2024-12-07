@@ -17,6 +17,7 @@ function Login() {
   const [debounceState, setDebounceState] = useState(false);
   const [status, setStatus] = useState('idle');
   const [error, setError] = useState('');
+  const [role,setRole] = useState('user') // userstate(default:"user")
   const navigate = useNavigate();
 
   const handleShowPassword = useCallback(() => {
@@ -38,7 +39,7 @@ function Login() {
     const data = { email, password };
     setStatus('loading');
     try {
-      const res = await axios.post(`/admin/login`, data, {
+      const res = await axios.post(`/${role}/login`, data, {
         headers: { 'Access-Control-Allow-Origin': '*' },
       });
 
@@ -50,7 +51,9 @@ function Login() {
        if(res.data.user.role ==="admin"){
         navigate('/main/admin/dashboard');
         setStatus('idle');
-       };
+       }else{
+          navigate('/');
+       }
      
     } catch (e) {
       setError(e.response?.data?.message || 'An error occurred during login');
@@ -100,6 +103,29 @@ function Login() {
             <div className='show-password' onClick={handleShowPassword}>
               {isShowPassword ? 'Hide' : 'Show'} Password
             </div>
+            <div className='role-container'>
+              <label>
+                <input
+                  type='radio'
+                  name='role'
+                  value='user'
+                  checked={role === 'user'}
+                  onChange={() => setRole('user')}
+                />
+                User
+              </label>
+              <label>
+                <input
+                  type='radio'
+                  name='role'
+                  value='admin'
+                  checked={role === 'admin'}
+                  onChange={() => setRole('admin')}
+                />
+                Admin
+              </label>
+            </div>
+             
             <div className='submit-container'>
               <button
                 type='button'

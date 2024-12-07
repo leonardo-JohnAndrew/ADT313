@@ -52,16 +52,26 @@ const Home = () => {
                 'https://image.tmdb.org/t/p/original/undefined'
                   ? featuredMovie.backdropPath
                   : featuredMovie.posterPath
-              }) no-repeat center top`,
+              }) no-repeat center fixed  `,
             }}
           >
             <span className='featured-movie-title'>{featuredMovie.title}</span>
+           <textarea className="description" value={featuredMovie.overview}></textarea>
           </div>
         </div>
       ) : (
         <div className='featured-list-container-loader'></div>
       )}
-      <div className='list-container'>
+        <div className="heading">
+           <h3 >Available Movie</h3>
+        </div>
+      <div className='list-container'
+       style={{ 
+        
+        
+
+       }}
+      >
         {movieList.map((movie) => (
           <>
             <MovieCards

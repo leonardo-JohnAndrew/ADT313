@@ -1,14 +1,29 @@
 .card {
-  max-width: 180px;
-  border: 20px solid #898989;
-  background-color: #898989;
+  max-width: 100px;
+   /* border: 20px solid hsla(hue, saturation, lightness, 1); */
+
+  transition: transform .2s;
+   padding: 1em ;
+   border: 1px solid rgb(83, 78, 78) ;
+ position: relative;
+ 
 }
 .card img {
-  max-width: 180px;
+  max-width:  100px;;
   object-fit: contain;
+
+}
+.card:hover {
+  transform: scale(1.2);
+  border: 2px solid  gold;
+}
+ 
+
+.title {
+  color:rgb(34, 32, 32);
+  /* background-color:rgba(15, 15, 15, 0.5); */
+  padding: 3%;
+  font-weight:500;
+  display: block;
 }
 
-.card:hover {
-  border: 20px solid #3f3f3f;
-  background-color: #3f3f3f;
-}

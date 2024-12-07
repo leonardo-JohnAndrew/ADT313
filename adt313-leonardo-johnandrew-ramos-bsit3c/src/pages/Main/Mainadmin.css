@@ -46,6 +46,7 @@
     .Mainadmin .admincontainer .adminnavigation ul li.active,
     .Mainadmin .admincontainer .adminnavigation ul li:hover {
           border: 1px solid yellow;
+          background: gray ;
        
     }
     .Mainadmin .admincontainer .adminnavigation ul li a {

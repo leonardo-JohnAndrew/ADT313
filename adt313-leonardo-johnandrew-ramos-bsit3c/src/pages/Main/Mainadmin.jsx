@@ -11,21 +11,29 @@ function Mainadmin() {
     localStorage.removeItem('accessToken');  // Remove token from localStorage
     navigate('/login');
   };
+
+  const rolecheck = () => {        //check userrole 
+    if (userInfo.role === 'user'){ 
+          navigate('/')
+     }
+}
   useEffect(() => {
     if (!usertoken) {  // If no token in context, log out
       handleLogout();
     }
-  }, [usertoken]);
+    rolecheck();
+
+  }, []); 
 
   return (
     <div className="Mainadmin">
       <div className="admincontainer">
         <div className="adminnavigation">
           <ul>
-            <li><a href='/main/admin/profile' className='username'> {userInfo? userInfo.lastName :"none"}</a></li>
+            <li> {userInfo? userInfo.lastName :"none"}</li>
             <li><a href='/main/admin/dashboard'>Dashboard</a></li>
             <li><a href='/main/admin/movies'>Movies</a></li>
-            <li><a href='/main/admin/users'>Users</a></li>
+           
             <li className='logout'><a onClick={handleLogout}>Logout</a></li>
           </ul>
         </div>

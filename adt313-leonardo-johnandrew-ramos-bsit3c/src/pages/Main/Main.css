@@ -10,14 +10,16 @@
   height: 100vh;
 }
 .Main .container .outlet {
-  flex-grow: 3;
   padding: 1rem;
   overflow-y: auto;
 }
 .Main .container .navigation {
-  height: 80px;
-  background-color: #15171b;
-  width: 100%;
+  background-color: black;
+ width: 100%;
+  margin-right: 2%;
+  box-shadow:  2px 5px 10px gold ;
+ height: 10%;
+ margin-bottom: 2%;
 }
 .Main .container .navigation ul {
   list-style: none;
@@ -49,6 +51,8 @@
 .Main .container .navigation ul li.active,
 .Main .container .navigation ul li:hover {
   background: #353a43;
+  border: 1px yellow solid;
+
 }
 .Main .container .navigation ul li a {
   text-decoration: none;

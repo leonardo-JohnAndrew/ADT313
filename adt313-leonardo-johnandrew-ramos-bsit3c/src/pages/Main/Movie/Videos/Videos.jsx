@@ -79,6 +79,8 @@ const Videos = () =>{
     const { movieId } = useParams();
     const [video, setVideos] = useState({ video : []
     });
+    const [editInfo ,setEditInfo] = useState(null)
+    const [isUpload, setUpload] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [id] = useState(4)
@@ -143,7 +145,7 @@ const Videos = () =>{
         axios
             .get(`/movies/${movieId}`)
             .then((res) => {    
-                const data = Array.isArray(res.data.casts) ? res.data.casts : [res.data.casts];
+                const data = Array.isArray(res.data.casts) ? res.data.videos : [res.data.videos];
                 dispatch({ type: actions.FETCH_SUCCESS, payload: data , id: res.data.tmdbId});
             })
             .catch((err) => {
@@ -157,35 +159,26 @@ const Videos = () =>{
 
     useEffect(()=>{
         fetchphoto()
-      
     },[])
     
+    const handleEditClick = (video) => {
+        setEditInfo(video); 
+    };
+
     const handleUpdate = async () => {
-        const data = { 
-            movieId: "30",
-            name: "named",
-            url: "ul",
-            site: "dd",
-            videoKey: "dsfj",
-            videoType: "jdfi",
-            official: false,
-       
-        };
-    
+        if (!editInfo) return;
+
         try {
-            const res = await axios.patch(`/videos/${id}`, data, {
-                headers: {
-                    Authorization: `Bearer ${usertoken}`,
-                    Accept: "application/json",
-                },
+            await axios.patch(`/videos/${editInfo.id}`, editInfo, {
+                headers: { Authorization: `Bearer ${usertoken}` },
             });
-            alert("Updated successfully!");
-        } catch (error) {
-            console.error("Error updating video:", error.response.data);
+            dispatch({ type: actions.UPDATE, payload: editInfo });
+            alert("Video updated successfully!");
+            setEditInfo(null); // Clear the edit state
+        } catch (err) {
             alert("Failed to update video.");
         }
     };
-    
     return(
         <>
          <h4 style={
@@ -213,7 +206,7 @@ const Videos = () =>{
                     src={`https://www.youtube.com/embed/${item.key}`}
                     title={item.name}
                     className="video"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                     autoplay
                     allowFullScreen
                 ></iframe>
                 <div className="info" >
@@ -228,8 +221,59 @@ const Videos = () =>{
     ))}
 </div>
         {/* {JSON.stringify(state.items)} */}
-        <button className="update" onClick={()=>{handleUpdate()}}>update</button>
+        <h4>My Current Videos</h4>
+            <div className="video-container">
+                {state.items.map((item) => (
+                    <div
+                        key={item.id}
+                        className="video-card"
+                        onMouseEnter={(e) => {
+                            e.currentTarget.querySelector(".info").style.display = "block";
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.querySelector(".info").style.display = "none";
+                        }}
+                    >
+                        <iframe src={item.url} title={item.name} className="video" />
+                        <p>{item.name}</p>
+
+                        <div className="info"        
+                      onClick={() => handleEditClick(item)}
+                        >edit</div>
+                    </div>
+                
+                ))}
+                
+            </div>
+
+            {editInfo && (
+                <div className="edit-form">
+                    <h4>Edit Video</h4>
+                    <label>Name:</label>
+                    <input
+                        type="text"
+                        value={editInfo.name}
+                        onChange={(e) =>
+                            setEditInfo({ ...editInfo, name: e.target.value })
+                        }
+                    />
+                    <label>URL:</label>
+                    <input
+                        type={isUpload ? "file" : "text"}
+                        value={isUpload ? undefined : editInfo.url}
+                        onChange={(e) =>
+                            !isUpload &&
+                            setEditInfo({ ...editInfo, url: e.target.value })
+                        }
+                    />
+                         <button onClick={() => setUpload(!isUpload)}>
+            {isUpload ? "Switch to URL Input" : "Switch to File Upload"}
+          </button>
+                    <button onClick={handleUpdate}>Update</button>
+                </div>
+            )}
         </>
+    
     );
 };
 

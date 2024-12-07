@@ -19,6 +19,7 @@ function Register() {
   const firstRef = useRef();
   const lastRef = useRef(); 
   const correctRef = useRef(); 
+  const [role, setRole] = useState('user'); 
   const [isShowPassword, setIsShowPassword] = useState(false);
   const userInputDebounce = useDebounce({
      email,
@@ -85,9 +86,11 @@ function Register() {
     setStatus('...');
     console.log(data);
 
+    const url = role === 'admin' ? '/admin/register' : '/user/register';
+
     await axios({
       method: 'post',
-      url: '/admin/register',
+      url,
       data,
       headers: {'Access-Control-Allow-Origin': '*'
        }
@@ -97,7 +100,7 @@ function Register() {
       .then((res) => {
         console.log(res);
         localStorage.setItem('accessToken', res.data.access_token);
-        navigate('/main');
+        navigate('/login');
         setStatus('idle');
         alert('successfully created');
       })
@@ -118,7 +121,15 @@ function Register() {
         <h3>Register</h3>
         <form>
           <div className='form'>  
-          
+             <label>Role:</label>
+             <select
+             name="role"
+             value={role}
+             onChange={(e) => setRole(e.target.value)}
+             >
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+            </select>
                <label>Firstname:</label>
                <input
                type="text"
