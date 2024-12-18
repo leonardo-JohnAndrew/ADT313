@@ -33,3 +33,22 @@
     font-size: 12px;
     text-align: center;
 }
+
+.browse{
+ height: 10em;
+ width: auto;
+ align-content: center;
+ position: relative;
+}
+.browse .select{
+    height: 100%;
+    width: auto;
+    border : 2px dotted gold;
+
+}
+.browse .select::after{
+    content: "Select photo";
+    background-color: lightgoldenrodyellow;
+    color: black;
+
+}

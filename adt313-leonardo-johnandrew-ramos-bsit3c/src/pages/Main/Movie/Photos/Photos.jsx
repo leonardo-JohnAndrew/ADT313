@@ -6,6 +6,8 @@ import axios from "axios";
 import { type } from "@testing-library/user-event/dist/type";
 import { useMovieContext } from "../../../../context/MovieContext";
 import './Photos.css'
+import { forms } from "../../../../functions/formdata";
+import { use } from "react";
 const initial = {
     items :[],
     loading: false ,
@@ -81,9 +83,15 @@ const Photos = () =>{
     const [editInfo, setEditInfo] = useState(null)
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-    const[id] =useState(5)
+    // const[id] =useState(5);
+    let  send = { };
+    const [form , setForm] = useState(null) 
     const [file , setFile] = useState()
     const [upload ,setUpload] = useState(false);
+    const [preview ,setPreview] = useState(null)
+    const BASE_URL = 'http://localhost:3000';
+    // const [url , seturl] = useState();
+    // const imageUrl = ;
     // alert(movie.tmdbId)
     const fetchphoto = useCallback(() =>{ 
         
@@ -114,24 +122,69 @@ const Photos = () =>{
     useEffect(()=>{
         fetchphoto()
     },[])
+     
+    const file_drop = (e)=>{
+      e.preventDefault();
+
+      const files = e.dataTransfer.files[0];
+      if (files) {
+        if (!files || (files.type !== "image/png" && files.type !== "image/jpeg"
+          && files.type !== "image/jpg"
+          && files.type !== "image/gif"
+        )) {
+          alert("Only PNG  JPEG GIF OR JPG files are allowed.");
+          return;
+       }
+        setPreview( URL.createObjectURL(files));  //preview
+    }
+     setForm((prev)=>({
+      ...prev ,
+      file : files,
+      movieId:movieId,
+      userId : userInfo.userId
+
+     }))
+
+    }
+
+    const handlesave = async (image , backdrops= true, isUpload = true) => {
     
-    const handlesave = async (image , backdrops= true) => {
-            
+      if(isUpload){ 
+        
+        const received = forms(form,"photos","create");
+        // console.log("received: ", received );
+        if (!received) {
+          alert("Invalid file or form data.");
+          return; 
+       }
+       send =received;
+      }else{
+     
         const newEntry= {
-            useId :userInfo.userId ,
-            movieId:movieId ,
-            description: backdrops? 'Backdrop': 'Poster',
-            url :image.file_path?   `https://image.tmdb.org/t/p/original${image.file_path}`:'no url',
+          useId :userInfo.userId ,
+          movieId:movieId ,
+          description: backdrops? 'Backdrop': 'Poster',
+          url :image.file_path?   `https://image.tmdb.org/t/p/original${image.file_path}`:'no url',
            
         };
+       send = newEntry;
+      }
+
         try {
-            const res = await axios.post("/admin/photos", newEntry, {
+            const res = await axios.post("/admin/photos",send, {
                 headers: {
                     Authorization: `Bearer ${usertoken}`,
-                    Application: 'JSON/Application'
+                    Application: 'JSON/Application',
+                    "Content-Type": "multipart/form-data"
+
                 },
             });
             dispatch({ type: actions.CREATE, payload: res.data });
+            console.log ('send file ',send); 
+            setForm(null)
+            setFile(null)
+            setPreview(null) 
+           document.querySelector('.browse .input input').value = ""
             alert("Added  Photo Successfully!");
         } catch (error) {
             console.error("Error adding to database:", error.message);
@@ -165,35 +218,67 @@ const Photos = () =>{
         setUpload(false); // Reset upload state
       };
     
-      const handleUpdate = async () => {
+      const handleUpdate = async (e) => {
         if (!editInfo) return;
-    
-     
-        const fd = new FormData();
-        fd.append('file',file);
-        const updatedData = {
-          ...editInfo,
-          description: editInfo.description || "Updated description",
-          url:fd
-        };
-    
+         
+
+        if(setUpload === true){
+          setForm((prev)=>({
+            ...prev,
+            movieId:movieId,
+            // description:editInfo.description
+          }))
+
+          const received = forms(
+            form,
+            "photos"
+          );
+          // console.log('foernn', form)
+        if (!received) {
+          alert("Invalid file or form data.");
+          return;
+       }
+            // console.log("recieved: ", received)   
+            //post file upload
         try {
-          const res = await axios.post(`/photos/${editInfo.id}`,updatedData, {
+          // console.log('files',file)
+          const res = await axios.post(`/photos/${editInfo.id}`,received, {
             headers: { 
                Authorization: `Bearer ${usertoken}`,
                 "Content-Type": "multipart/form-data"
                  
-              
               },
           });
           dispatch({ type: actions.UPDATE, payload: res.data });
-          alert("Updated successfully!");
-          console.log(res.data);
-          setEditInfo(null); // Clear edit state
+          alert("Updated successfully!")
+          setUpload(false);
         } catch (error) {
           console.error("Error updating photo:", error.response?.data);
           alert("Failed to update photo.");
         }
+        }else{
+          //patch no files
+          console.log("ashhgreji",editInfo.description);
+          try {
+            const res = await axios.patch(`/photos/${editInfo.id}`,editInfo, {
+              headers: { 
+                 Authorization: `Bearer ${usertoken}`,
+                   
+                },
+            });
+            dispatch({ type: actions.UPDATE, payload: res.data });
+            setEditInfo(null); // Clear edit state
+            setPreview(null)
+            setForm(null)
+            alert("Updated successfully!");
+          
+            
+          } catch (error) {
+            console.error("Error updating photo:", error.response?.data);
+            alert("Failed to update photo.");
+          }
+        }
+     
       };
     
 
@@ -201,6 +286,7 @@ const Photos = () =>{
 
     return(
         <> 
+      
           <h4 style={
              {
                 color: "lightyellow"
@@ -230,7 +316,7 @@ const Photos = () =>{
                     />
                     <div className="info" >
                         <p>URL: {`https://image.tmdb.org/t/p/original${item.file_path}`}</p>
-                         <button className="savebutton"  onClick={() => handlesave(item,true)} >Add</button>
+                         <button className="savebutton"  onClick={() => handlesave(item,true,false)} >Add</button>
                    
                     </div>
                     
@@ -241,7 +327,7 @@ const Photos = () =>{
              {
                 color: "lightyellow"
              }
-         }>This is the suggested poster add to save </h4>
+         }>Posters </h4>
         <div className="photos-container" >
             {state.loading && <p>Loading...</p>}
             {state.error && <p>Error: {state.error}</p>}
@@ -266,12 +352,42 @@ const Photos = () =>{
                     />
                     <div className="info" >
                         <p>URL: {`https://image.tmdb.org/t/p/original${item.file_path}`}</p>
-                         <button className="savebutton"  onClick={() => handlesave(item,false)} >Add</button>
+                         <button className="savebutton"  onClick={() => handlesave(item,false,false)} >Add</button>
                    
                     </div>
                     
                 </div>
             ))}
+        </div>
+       <h4 style={{ color: "lightyellow" }}>Drag Photo</h4>
+       {/* {JSON.stringify(file)} */}
+        <div className="browse">
+           <div className="select"
+             onDrop={file_drop}
+             onDragOver={(e)=>{e.preventDefault();}}
+             onDragEnter={(e)=>{e.preventDefault();}}
+             onDragLeave={(e)=>{e.preventDefault();}}
+             style={{
+              background: preview
+              ? `url(${preview}) no-repeat center/contain`
+              : "none", 
+             }}
+           >
+           </div>
+           <div className="input">
+              <input type="text" 
+               onChange={(e)=>
+                setForm((prev)=>({
+                  ...prev ,
+                  description: e.target.value
+                 }))
+            
+               }
+              />
+           </div>
+            <div className="save"> 
+               <input type="submit" value="save" onClick={handlesave} />
+            </div>
         </div>
         <h4 style={{ color: "lightyellow" }}>Current Photo List</h4>
       <div className="photos-container">
@@ -283,13 +399,15 @@ const Photos = () =>{
             className="photo-card"
             onClick={() => handleEditClick(item)} // Select photo for editing
           >
-            <img src={item.url} alt="Movie Backdrop" className="photo-image" />
+            
+<img src={item.url&&item.url.startsWith('http')? item.url :`${BASE_URL}/${item.url}`} alt="Photos" className="photo-image" /> 
             <div className="info">
               <p>URL: {item.url}</p>
             </div>
           </div>
         ))}
-      </div>
+      </div> 
+      
 
       {editInfo && (
         <div className="edit-container">
@@ -310,10 +428,22 @@ const Photos = () =>{
                 File:
                 <input
                   type="file"
-                  onChange={(e)=>{
-                    setFile(e.target.files[0])
+                  onChange={(e) => {
+                    const files = e.target.files[0];
+                    if (files) {
+                      if (!files || (files.type !== "image/png" && files.type !== "image/jpeg"
+                        && files.type !== "image/jpg"
+                        && files.type !== "image/gif"
+                      )) {
+                        alert("Only PNG  JPEG GIF OR JPG files are allowed.");
+                        return;
+                     }
+                      setForm((prev) => ({
+                        ...prev,
+                        file: files,
+                      }));
+                    }
                   }}
-                  
                 />
               </>
             ) : (
@@ -322,9 +452,10 @@ const Photos = () =>{
                 <input
                   type="text"
                   value={editInfo.url || ""}
-                  onChange={(e) =>
-                    setEditInfo({ ...editInfo, url: e.target.value })
-                  }
+                  onChange={(e)=>setEditInfo((prev)=>({
+                    ...prev,
+                    url: e.target.value
+                  }))}
                 />
               </>
             )}
