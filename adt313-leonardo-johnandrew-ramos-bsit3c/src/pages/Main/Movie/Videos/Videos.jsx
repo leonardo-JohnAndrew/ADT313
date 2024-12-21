@@ -80,10 +80,13 @@ const Videos = () =>{
     const [video, setVideos] = useState({ video : []
     });
     const [editInfo ,setEditInfo] = useState(null)
+    const [form , setForm] = useState(null)
+    const [file , setFile] = useState()
     const [isUpload, setUpload] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [id] = useState(4)
+    const BASE_URL = 'http://localhost:3000';
     //   alert(movie.tmdbId)
     const fetchphoto = useCallback(() =>{
         
@@ -168,7 +171,45 @@ const Videos = () =>{
     const handleUpdate = async () => {
         if (!editInfo) return;
 
-        try {
+        if(setUpload === true){
+            setForm((prev)=>({
+                ...prev,
+                movieId: movieId, 
+                name:editInfo.name,
+                site:editInfo.site,
+                videoType:editInfo.videoType,
+                videoKey:editInfo.videoKey,
+                official:editInfo.official
+                
+            }))
+            
+            const received = form(
+                form,
+               "videos"
+            )
+            if(!received){
+                alert("Invalid File")
+                return;
+            }
+
+            try {
+                
+               const res = await axios.post(`/videos/${editInfo.id}}` ,received, {
+                headers: {
+                    Authorization: `Bearer${usertoken}`,
+                    "Content-Type":"multipart/form-data"
+                },
+               });
+               dispatch({type:actions.UPDATE, payload: res.data})
+               alert("Updated successfully!")
+               setUpload(false); 
+                
+            } catch (error) { 
+              console.error("Error Updating Photos;", error.message)
+              alert("Failed to Update")
+            }
+        }else{ 
+            try {
             await axios.patch(`/videos/${editInfo.id}`, editInfo, {
                 headers: { Authorization: `Bearer ${usertoken}` },
             });
@@ -177,6 +218,19 @@ const Videos = () =>{
             setEditInfo(null); // Clear the edit state
         } catch (err) {
             alert("Failed to update video.");
+        }
+    }
+    };
+     
+    const handleDelete = async (id) => {
+        try {
+            await axios.delete(`/videos/${id}`, {
+                headers: { Authorization: `Bearer ${usertoken}` },
+            });
+            dispatch({ type: actions.DELETE_CAST, payload: id });
+            alert("Deleted successfully!");
+        } catch (error) {
+            console.error("Error Videos cast:", error.message);
         }
     };
     return(
@@ -234,17 +288,26 @@ const Videos = () =>{
                             e.currentTarget.querySelector(".info").style.display = "none";
                         }}
                     >
-                        <iframe src={item.url} title={item.name} className="video" />
+                        <iframe src={item.url&&item.url.startsWith('http')? item.url :`${BASE_URL}/${item.url}`}  title={item.name} className="video" />
                         <p>{item.name}</p>
 
                         <div className="info"        
-                      onClick={() => handleEditClick(item)}
-                        >edit</div>
-                    </div>
+                        ><button 
+                        onClick={() => handleEditClick(item)}
+                        >Edit </button>
+                        <button
+                        onClick={()=>handleDelete(item.id)}
+                        >
+                         delete
+                        </button>
+                        </div>
+
+                    </div> 
                 
                 ))}
                 
             </div>
+             
 
             {editInfo && (
                 <div className="edit-form">
@@ -257,15 +320,79 @@ const Videos = () =>{
                             setEditInfo({ ...editInfo, name: e.target.value })
                         }
                     />
-                    <label>URL:</label>
-                    <input
-                        type={isUpload ? "file" : "text"}
-                        value={isUpload ? undefined : editInfo.url}
-                        onChange={(e) =>
-                            !isUpload &&
-                            setEditInfo({ ...editInfo, url: e.target.value })
-                        }
+                 
+                 <label>
+            {isUpload ? (
+              <>
+                File:
+                <input
+                  type="file"
+                  onChange={(e) => {
+                    const files = e.target.files[0];
+                    if (files) {
+                      if (!files || (files.type !== "video/mp4" && files.type !== "video/mpg"
+                        && files.type !== "video/mpeg"
+                      )) {
+                        alert("Only mp4, mpg, mpeg files are allowed.");
+                        return;
+                     }
+                      setForm((prev) => ({
+                        ...prev,
+                        file: files,
+                      }));
+                    }
+                  }}
+                />
+              </>
+            ) : (
+              <>
+                URL:
+                <input
+                  type="text"
+                  value={editInfo.url || ""}
+                  onChange={(e)=>setEditInfo((prev)=>({
+                    ...prev,
+                    url: e.target.value
+                  }))}
+                />
+              </>
+            )}
+          </label>
+                    <label>Site</label>
+                    <input 
+                       type="text"
+                       value={editInfo.site}
+                       onChange={(e)=>
+                        setEditInfo({...editInfo, site: e.target.value})
+                       }
                     />
+                     <label>VideoType</label>
+                      <input 
+                       type="text"
+                       value={editInfo.videoType}
+                       onChange={(e)=>
+                        setEditInfo({...editInfo, videoType: e.target.value})
+                       }
+                     />
+                      <label>VideoKey</label>
+                      <input 
+                       type="text"
+                       value={editInfo.videoKey}
+                       onChange={(e)=>
+                        setEditInfo({...editInfo, videoKey: e.target.value})
+                       }
+                     />
+                        <label>
+                <input
+                  type='radio'
+                  name='role'
+                  value={editInfo.official}
+                  checked={editInfo.official == true}
+                  onChange={(e) => setEditInfo({...editInfo, official: editInfo? true :false})}
+                />
+                Official
+              </label>
+                                        
                          <button onClick={() => setUpload(!isUpload)}>
             {isUpload ? "Switch to URL Input" : "Switch to File Upload"}
           </button>

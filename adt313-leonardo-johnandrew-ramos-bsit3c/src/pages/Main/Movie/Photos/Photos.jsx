@@ -90,6 +90,21 @@ const Photos = () =>{
     const [upload ,setUpload] = useState(false);
     const [preview ,setPreview] = useState(null)
     const BASE_URL = 'http://localhost:3000';
+
+    const [backdropPage, setBackdropPage] = useState(1);
+    const [posterPage, setPosterPage] = useState(1);
+    const itemsPerPage = 10;
+  
+    const paginate = (data, page) => {
+      const start = (page - 1) * itemsPerPage;
+      return data.slice(start, start + itemsPerPage);
+  };
+
+  const backdrops = paginate(photos.backdrops, backdropPage);
+  const posters = paginate(photos.posters, posterPage);
+
+  const totalBackdropPages = Math.ceil(photos.backdrops.length / itemsPerPage);
+  const totalPosterPages = Math.ceil(photos.posters.length / itemsPerPage);
     // const [url , seturl] = useState();
     // const imageUrl = ;
     // alert(movie.tmdbId)
@@ -258,7 +273,7 @@ const Photos = () =>{
         }
         }else{
           //patch no files
-          console.log("ashhgreji",editInfo.description);
+          // console.log("ashhgreji",editInfo.description);
           try {
             const res = await axios.patch(`/photos/${editInfo.id}`,editInfo, {
               headers: { 
@@ -280,7 +295,18 @@ const Photos = () =>{
         }
      
       };
-    
+
+      const handleDelete = async (id) => {
+        try {
+            await axios.delete(`/photos/${id}`, {
+                headers: { Authorization: `Bearer ${usertoken}` },
+            });
+            dispatch({ type: actions.DELETE_CAST, payload: id });
+            alert("Deleted successfully!");
+        } catch (error) {
+            console.error("Error Videos cast:", error.message);
+        }
+    }
 
 
 
@@ -295,7 +321,7 @@ const Photos = () =>{
         <div className="photos-container" >
             {state.loading && <p>Loading...</p>}
             {state.error && <p>Error: {state.error}</p>}
-            {photos.backdrops.map((item, index) => (
+            {backdrops.map((item, index) => (
                 <div
                     key={index}
                     className="photo-card"
@@ -323,6 +349,23 @@ const Photos = () =>{
                 </div>
             ))}
         </div>
+        <div className="pagination">
+                <button
+                    disabled={backdropPage === 1}
+                    onClick={() => setBackdropPage(backdropPage - 1)}
+                >
+                    Previous
+                </button>
+                <span>
+                    Page {backdropPage} of {totalBackdropPages}
+                </span>
+                <button
+                    disabled={backdropPage === totalBackdropPages}
+                    onClick={() => setBackdropPage(backdropPage + 1)}
+                >
+                    Next
+                </button>
+            </div>
         <h4 style={
              {
                 color: "lightyellow"
@@ -331,7 +374,7 @@ const Photos = () =>{
         <div className="photos-container" >
             {state.loading && <p>Loading...</p>}
             {state.error && <p>Error: {state.error}</p>}
-            {photos.posters.map((item, index) => (
+            {posters.map((item, index) => (
                 <div
                     key={index}
                     className="photo-card"
@@ -359,6 +402,23 @@ const Photos = () =>{
                 </div>
             ))}
         </div>
+        <div className="pagination">
+                <button
+                    disabled={posterPage === 1}
+                    onClick={() => setPosterPage(posterPage - 1)}
+                >
+                    Previous
+                </button>
+                <span>
+                    Page {posterPage} of {totalPosterPages}
+                </span>
+                <button
+                    disabled={posterPage === totalPosterPages}
+                    onClick={() => setPosterPage(posterPage + 1)}
+                >
+                    Next
+                </button>
+            </div>
        <h4 style={{ color: "lightyellow" }}>Drag Photo</h4>
        {/* {JSON.stringify(file)} */}
         <div className="browse">
@@ -375,6 +435,7 @@ const Photos = () =>{
            >
            </div>
            <div className="input">
+            <span>Description:</span>
               <input type="text" 
                onChange={(e)=>
                 setForm((prev)=>({
@@ -389,7 +450,7 @@ const Photos = () =>{
                <input type="submit" value="save" onClick={handlesave} />
             </div>
         </div>
-        <h4 style={{ color: "lightyellow" }}>Current Photo List</h4>
+        <h4 style={{ color: "lightyellow" , margintop:"5px"}}>Current Photo List</h4>
       <div className="photos-container">
         {state.loading && <p>Loading...</p>}
         {state.error && <p>Error: {state.error}</p>}
@@ -464,7 +525,8 @@ const Photos = () =>{
             {upload ? "Switch to URL Input" : "Switch to File Upload"}
           </button>
           <button onClick={handleUpdate}>Save Changes</button>
-        </div>
+          <button onClick={()=>handleDelete(editInfo.id)}>delete</button>
+        </div> 
       )}
         </>
     );

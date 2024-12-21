@@ -214,7 +214,7 @@ const CRUDcrewandcast = () => {
                 movieId: editCast.movieId,
                 name : editCast.name ,
                 characterName:editCast.characterName,
-                url:"",
+                url:editCast.url,
 
             }
             const res = await axios.post(`/admin/casts/${editCast.id}`, data, {
@@ -339,13 +339,8 @@ const CRUDcrewandcast = () => {
                     {state.items.map((item)  => (
                         <tr >
                             <td>
-                                {editCast?.id === item.id?(
-                                 <input className="input" type="" 
-                                  
-                                 />
-                                ):(
-                                    <img  className="profile" src= {`https://image.tmdb.org/t/p/w500${item.url}`}   alt="none" />
-                                )}
+                             
+                              <img  className="profile" src= {`https://image.tmdb.org/t/p/w500${item.url}`}   alt="none" />
                             </td>
                             <td>
                                 {editCast?.id === item.id ? (

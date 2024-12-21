@@ -25,8 +25,19 @@ export function forms(formdata, category){
                   }
                     return forms; 
       case 'videos' :
-
-              return forms ;
+        if (!filevalidation(formdata.file, "videos")) {
+          return null;
+      } else {
+          // Append video data
+          forms.append('video', formdata.file);
+          forms.append('movieId', formdata.movieId);
+          forms.append('name', formdata.name);
+          forms.append('site', formdata.site);
+          forms.append('videoKey', formdata.key);
+          forms.append('videoType', formdata.type);
+          forms.append('official', formdata.official);
+      }
+      return forms;
         default :
            alert("not on the list")
              return null;
@@ -49,7 +60,13 @@ export function forms(formdata, category){
         return true;
       case 'videos':
           
+      if (!data || (data.type !== "video/mp4" && data.type !== "video/mpg"
+        && data.type !=="video/mpeg"
+      )){
+        alert("Only mp4, mpg, and mpeg files are accepted.");
         return false;
+    }
+    return true;
         
       default: 
          alert('not on the list')
